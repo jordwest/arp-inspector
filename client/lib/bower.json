@@ -1,0 +1,8 @@
+{
+    "name": "nodestrap",
+    "dependencies": {
+        "angular": "*",
+        "bootstrap": "*",
+        "angular-route": "*"
+    }
+}

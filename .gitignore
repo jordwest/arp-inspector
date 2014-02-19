@@ -3,4 +3,4 @@ client/lib/bower_components
 forever
 .build
 .*.swp
-
+npm-debug.log

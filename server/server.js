@@ -17,10 +17,12 @@ var devices = {};
 var addDevice = function(hwaddr, ip)
 {
     // Ignore broadcast addresses
+    /*
     if(hwaddr === '00:00:00:00:00:00')
     {
         return;
     }
+    */
 
     if(!(hwaddr in devices))
     {
@@ -28,6 +30,7 @@ var addDevice = function(hwaddr, ip)
     }
     devices[hwaddr].count++;
     devices[hwaddr].ip = ip;
+    devices[hwaddr].lastSeen = new Date();
 }
 
 pcap_session.on('packet', function(raw){

@@ -34,3 +34,30 @@
             </table>
         </div>
       </div>
+
+      <div class="row" ng-repeat="inspector in otherInspectors">
+        <div class="col-md-6">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>MAC address</th>
+                        <th>IP address</th>
+                        <th># ARP packets</th>
+                        <th>Last Packet</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="device in inspector.devices">
+                        <td>{{ device.mac }}</td>
+                        <td>{{ device.ip }}</td>
+                        <td>{{ device.count }}</td>
+                        <td am-time-ago="device.lastSeen"></td>
+                    </tr>
+                    <tr ng-show="devices.length == 0">
+                        <td colspan="4">No packets received yet...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+      </div>

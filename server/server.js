@@ -32,12 +32,10 @@ var devices = {};
 var addDevice = function(hwaddr, ip)
 {
     // Ignore broadcast addresses
-    /*nmap
     if(hwaddr === '00:00:00:00:00:00')
     {
         return;
     }
-    */
 
     if(!(hwaddr in devices))
     {
@@ -75,12 +73,12 @@ browser.on('serviceUp', function(service){
     {
         console.log("It's just ourselves....");
     }else{
-        // Somebody else on the network
+        console.log("It's somebody else on the network");
         var remoteInspector = {};
         otherInspectors.push(remoteInspector);
         ioclient.connect('http://' + service.addresses[1] + ':' + service.port);
         ioclient.on('devices', function(devices) {
-            otherInspectors[service.txtRecord.id].devices = devices;
+            remoteInspector.devices = devices;
             io.sockets.emit('otherInspectors', otherInspectors);
         });
     }

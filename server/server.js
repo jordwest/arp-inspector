@@ -78,10 +78,13 @@ browser.on('serviceUp', function(service){
         console.log("It's somebody else on the network");
         var remoteInspector = {};
         otherInspectors.push(remoteInspector);
-        ioclient.connect('http://' + service.addresses[1] + ':' + service.port);
-        ioclient.on('devices', function(devices) {
-            remoteInspector.devices = devices;
-            io.sockets.emit('otherInspectors', otherInspectors);
+        console.log(ioclient);
+        var s = ioclient.connect('http://' + service.addresses[1] + ':' + service.port);
+        s.on('connect', function(){
+            ioclient.on('devices', function(devices) {
+                remoteInspector.devices = devices;
+                io.sockets.emit('otherInspectors', otherInspectors);
+            });
         });
     }
 });

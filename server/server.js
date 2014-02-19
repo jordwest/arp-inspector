@@ -25,7 +25,9 @@ server.listen(PORT);
 
 var Pcap = require('pcap');
 
-var pcap_session = Pcap.createSession('en1', 'ether proto \\arp');
+var ethInterface = process.argv[2];
+console.log("Using interface " + ethInterface);
+var pcap_session = Pcap.createSession(ethInterface, 'ether proto \\arp');
 
 var devices = {};
 

@@ -76,7 +76,9 @@ browser.on('serviceUp', function(service){
         console.log("It's just ourselves....");
     }else{
         console.log("It's somebody else on the network");
-        var remoteInspector = {};
+        var remoteInspector = {
+            hostname: service.host
+        };
         otherInspectors.push(remoteInspector);
         console.log(ioclient);
         var s = ioclient.connect('http://' + service.addresses[1] + ':' + service.port);

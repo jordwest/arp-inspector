@@ -3,10 +3,25 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
+var ioclient = require('socket.io-client');
+
+var PORT = 7871;
+
+var mdns = require('mdns');
+var Crypto = require('crypto');
+
+var serverId = null;
+
+Crypto.pseudoRandomBytes(16, function(ex, bytes){
+    serverId = bytes.toString('hex');
+    // Advertise our service to others
+    var ad = mdns.createAdvertisement(mdns.tcp('arpinspector'), PORT, {txtRecord: {id: serverId}});
+    ad.start();
+});
 
 app.use(express.static(__dirname + '/../.build'));
 
-server.listen(8080);
+server.listen(PORT);
 
 var Pcap = require('pcap');
 
@@ -17,7 +32,7 @@ var devices = {};
 var addDevice = function(hwaddr, ip)
 {
     // Ignore broadcast addresses
-    /*
+    /*nmap
     if(hwaddr === '00:00:00:00:00:00')
     {
         return;
@@ -47,3 +62,30 @@ pcap_session.on('packet', function(raw){
 io.sockets.on('connection', function(socket){
     socket.emit('devices', devices);
 });
+
+
+
+var browser = mdns.createBrowser(mdns.tcp('arpinspector'));
+
+var otherInspectors = [];
+
+browser.on('serviceUp', function(service){
+    console.log("New arp inspector found: ", service);
+    if(service.txtRecord.id == serverId)
+    {
+        console.log("It's just ourselves....");
+    }else{
+        // Somebody else on the network
+        var remoteInspector = {};
+        otherInspectors.push(remoteInspector);
+        ioclient.connect('http://' + service.addresses[1] + ':' + service.port);
+        ioclient.on('devices', function(devices) {
+            otherInspectors[service.txtRecord.id].devices = devices;
+            io.sockets.emit('otherInspectors', otherInspectors);
+        });
+    }
+});
+browser.on('serviceDown', function(service){
+    console.log("Arp inspector down: ", service);
+});
+browser.start();

@@ -81,7 +81,7 @@ browser.on('serviceUp', function(service){
         };
         otherInspectors.push(remoteInspector);
         console.log(ioclient);
-        var s = ioclient.connect('http://' + service.addresses[1] + ':' + service.port);
+        var s = ioclient.connect('http://' + service.addresses[0] + ':' + service.port);
         s.on('connect', function(){
             s.on('devices', function(devices) {
                 remoteInspector.devices = devices;

@@ -29,20 +29,14 @@ module.exports = function(grunt) {
                     '.build/application.js': ['client/application.coffee', 'client/**/*.coffee']
                 }
             }
-        },
-        forever: {
-        	options: {
-        		index: 'server/server.js'
-        	}
-		}
+        }
     });
 
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-coffee');
-    grunt.loadNpmTasks('grunt-forever');
 
     grunt.registerTask('build', ['clean', 'coffee', 'copy']);
-    grunt.registerTask('default', ['build', 'forever:restart', 'watch']);
+    grunt.registerTask('default', ['build', 'watch']);
 };

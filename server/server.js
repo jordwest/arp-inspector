@@ -3,7 +3,6 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
-var ioclient = require('socket.io-client');
 var http = require('http');
 
 var PORT = 7871;
@@ -36,9 +35,14 @@ var addDevice = function(hwaddr, ip)
     {
         devices[hwaddr] = {mac: hwaddr, ip: ip, count: 0};
 
+        devices[hwaddr].vendor = "";
+
         // Get vendor
         http.get("http://api.macvendors.com/" + hwaddr, function(res){
-            devices[hwaddr].vendor = res.body;
+            res.on('data', function(chunk){
+                devices[hwaddr].vendor += chunk;
+                io.sockets.emit('devices', devices);
+            });
         });
     }
     devices[hwaddr].count++;
@@ -46,8 +50,8 @@ var addDevice = function(hwaddr, ip)
     devices[hwaddr].lastSeen = new Date();
 }
 
+
 pcap_session.on('packet', function(raw){
-    console.log("Packet coming in");
     var packet = Pcap.decode.packet(raw);
     if(packet.link && packet.link.arp)
     {

@@ -4,20 +4,13 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
 var ioclient = require('socket.io-client');
+var http = require('http');
 
 var PORT = 7871;
 
-var mdns = require('mdns');
 var Crypto = require('crypto');
 
 var serverId = null;
-
-Crypto.pseudoRandomBytes(16, function(ex, bytes){
-    serverId = bytes.toString('hex');
-    // Advertise our service to others
-    var ad = mdns.createAdvertisement(mdns.tcp('arpinspector'), PORT, {txtRecord: {id: serverId}});
-    ad.start();
-});
 
 app.use(express.static(__dirname + '/../.build'));
 
@@ -42,6 +35,11 @@ var addDevice = function(hwaddr, ip)
     if(!(hwaddr in devices))
     {
         devices[hwaddr] = {mac: hwaddr, ip: ip, count: 0};
+
+        // Get vendor
+        http.get("http://api.macvendors.com/" + hwaddr, function(res){
+            devices[hwaddr].vendor = res.body;
+        });
     }
     devices[hwaddr].count++;
     devices[hwaddr].ip = ip;
@@ -49,6 +47,7 @@ var addDevice = function(hwaddr, ip)
 }
 
 pcap_session.on('packet', function(raw){
+    console.log("Packet coming in");
     var packet = Pcap.decode.packet(raw);
     if(packet.link && packet.link.arp)
     {
@@ -63,34 +62,3 @@ io.sockets.on('connection', function(socket){
     socket.emit('devices', devices);
 });
 
-
-
-var browser = mdns.createBrowser(mdns.tcp('arpinspector'));
-
-var otherInspectors = [];
-
-browser.on('serviceUp', function(service){
-    console.log("New arp inspector found: ", service);
-    if(service.txtRecord.id == serverId)
-    {
-        console.log("It's just ourselves....");
-    }else{
-        console.log("It's somebody else on the network");
-        var remoteInspector = {
-            hostname: service.host
-        };
-        otherInspectors.push(remoteInspector);
-        console.log(ioclient);
-        var s = ioclient.connect('http://' + service.addresses[0] + ':' + service.port);
-        s.on('connect', function(){
-            s.on('devices', function(devices) {
-                remoteInspector.devices = devices;
-                io.sockets.emit('otherInspectors', otherInspectors);
-            });
-        });
-    }
-});
-browser.on('serviceDown', function(service){
-    console.log("Arp inspector down: ", service);
-});
-browser.start();

@@ -15,6 +15,7 @@
                 <thead>
                     <tr>
                         <th>MAC address</th>
+                        <th>Vendor</th>
                         <th>IP address</th>
                         <th># ARP packets</th>
                         <th>Last Packet</th>
@@ -24,6 +25,7 @@
                 <tbody>
                     <tr ng-repeat="device in devices">
                         <td>{{ device.mac }}</td>
+                        <td>{{ device.vendor }}</td>
                         <td>{{ device.ip }}</td>
                         <td>{{ device.count }}</td>
                         <td am-time-ago="device.lastSeen"></td>

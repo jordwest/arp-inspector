@@ -5,6 +5,9 @@ var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
 var http = require('http');
 
+// Don't log all the socket output
+io.set('log level', 1);
+
 var PORT = 7871;
 
 var Crypto = require('crypto');

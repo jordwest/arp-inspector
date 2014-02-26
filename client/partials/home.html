@@ -10,19 +10,8 @@
       <!-- Example row of columns -->
       <div class="row">
         <div class="col-md-12">
-            <svg height="300" width="400">
-            <circle ng-repeat="element in elements"
-                ng-attr-cx="{{ element.x }}"
-                ng-attr-cy="{{ element.y }}"
-                ng-attr-r="{{ element.count }}">
-            </circle>
-            <text
-                ng-repeat="element in elements"
-                ng-attr-x="{{ element.x + 20 }}"
-                ng-attr-y="{{ element.y }}" >
-                {{ element.ip }}
-            </text>
-            </svg>
+            <div id="network-graph">
+            </div>
 
           <h4>Local</h4>
             <table class="table table-bordered table-striped">

@@ -26,6 +26,9 @@ var pcap_session = Pcap.createSession(ethInterface, 'ether proto \\arp');
 
 var devices = {};
 
+var ping = require('net-ping');
+var session = ping.createSession();
+
 var addDevice = function(hwaddr, ip)
 {
     // Ignore broadcast addresses
@@ -46,6 +49,14 @@ var addDevice = function(hwaddr, ip)
                 devices[hwaddr].vendor += chunk;
                 io.sockets.emit('devices', devices);
             });
+        });
+
+        session.pingHost(ip, function(err, target){
+            if(err){
+                console.log("No response from", ip);
+            }else{
+                console.log("Pinged", ip);
+            }
         });
     }
     devices[hwaddr].count++;

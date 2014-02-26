@@ -61,6 +61,7 @@ pcap_session.on('packet', function(raw){
         var arp = packet.link.arp;
         addDevice(arp.sender_ha, arp.sender_pa);
         addDevice(arp.target_ha, arp.target_pa);
+        io.sockets.emit('arp', {from: arp.sender_pa, to: arp.target_pa});
     }
     io.sockets.emit('devices', devices);
 });

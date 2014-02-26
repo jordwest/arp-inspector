@@ -70,6 +70,7 @@ angular.module('HomeCtrl', ['Socket', 'angularMoment'])
         .attr('class', 'text')
         .text((d) -> d.ip)
         .attr('text-anchor', 'middle')
+        .call(force.drag)
 
     force.on('tick', () ->
       updatePositions()
